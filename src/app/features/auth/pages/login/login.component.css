@@ -1,0 +1,27 @@
+.contenedor{
+    background: linear-gradient(to right, #33B5FF, #004166);
+  }
+  .loginBox {
+      font-family: 'Montserrat', sans-serif !important;
+    background-color: #FFFFFF;
+  }
+  hr{
+      margin: 10px 0px;
+      width: 21rem;
+      height: 2px;
+      border: none;
+      background: linear-gradient(to right, #33B5FF, #004166);
+  }
+  .boton {
+    background: linear-gradient(to right, #2ba4e9, #004166);
+    transition: transform 80ms ease-in;
+  
+    &:focus {
+      outline: none;
+    }
+  
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+  

@@ -1,0 +1,44 @@
+<!-- <input 
+    type="text" 
+    name="hidden-input-barcode" 
+    id="hidden-input-barcode" 
+    style="position: absolute; left: -9999px;"
+    #hiddenInputBarcode 
+    (input)="onInputChange($event)"
+    (blur)="onBlurHiddeninput()"
+    >
+
+<p-button 
+    icon="pi pi-barcode" 
+    [label]=buttonLabel 
+    (onClick)="scanProduct()"
+    styleClass="w-full h-full"                    
+/>  -->
+
+<!-- 
+<input
+    pInputText
+    type="text"
+    placeholder="Escanear productos"
+    pSize="small"
+    id="txtScanner"
+    #inputScanner
+    autocomplete="off"
+    (input)="onInputChange($event)"
+/> -->
+
+<p-inputgroup>
+    <p-inputgroup-addon class="bg-sky-950 text-white">
+        <i class="pi pi-barcode"></i>
+    </p-inputgroup-addon>
+    <input 
+        pInputText
+        type="text"
+        placeholder="Escanear productos"
+        pSize="small"
+        id="txtScanner"
+        #inputScanner
+        autocomplete="off"
+        (input)="onInputChange($event)"        
+    />
+</p-inputgroup>

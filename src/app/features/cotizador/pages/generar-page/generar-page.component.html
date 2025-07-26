@@ -1,0 +1,267 @@
+@if (loadingFetchData) {
+    <div class="fixed w-full h-full top-0 left-0 right-0 bottom-0 z-[60] bg-black opacity-40 flex items-center justify-center">
+        <p-progress-spinner strokeWidth="8" fill="transparent" animationDuration=".5s" [style]="{ width: '50px', height: '50px' }" />
+    </div>
+}
+
+
+<shared-navbar
+    [title]="pageTitle()"
+    [btnDisable]="isFormInvalid()"
+    (onSave)="saveToLocalStorageCotizacion()"
+    (onDelete)="confirmationModal($event)"
+    (onPrint)="onPrint()"
+    >
+</shared-navbar>
+
+<div class="vh-screen-navbar flex flex-col mx-auto p-3 lg:px-4 ">
+    
+    <div class="flex flex-col gap-3 ">        
+        <div class="grid grid-cols-11 gap-3">
+            <div class="col-span-8 sm:col-span-4 lg:col-span-5 sm:order-1">
+                <p-floatlabel variant="on">
+                    <input 
+                        pInputText
+                        autocomplete="off"
+                        minlength="8"
+                        maxlength="11"
+                        [(ngModel)]="cotizacion.noClient"
+                        inputmode="numeric"     
+                        (input)="validateOnlyNumbers($event)"
+                        (ngModelChange)="getClientDataMigo()"
+                        id="numDocCli"
+                        class="w-full h-[42px] "
+                        pSize="small"
+                    /> 
+                    <label for="numDocCli">N° Documento</label> 
+                </p-floatlabel>
+            </div>            
+            <div class="order-last sm:order-2 col-span-11 sm:col-span-5">
+                <!-- <p-floatlabel variant="on">
+                    <input 
+                        type="text"
+                        id="nomCli"
+                        pInputText 
+                        [disabled]="false"                        
+                        [(ngModel)]="cotizacion.clientName" 
+                        (ngModelChange)="onNameChange()"
+                        class="w-full"
+                        pSize="small"
+                        autocomplete="off"
+                    />              
+                    <label for="nomCli">Cliente</label>
+                </p-floatlabel> -->
+                <p-floatlabel variant="on">
+                    <p-autocomplete
+                        [(ngModel)]="selectedCustomer"
+                        [suggestions]="filteredCustomers"                                 
+                        (input)="writtingInterval($event)"                                
+                        (completeMethod)="writtingInterval($event)"
+                        (onSelect)="onSelectCustomer($event)"
+                        (onLazyLoad)="loadNextPageOfCustomers($event)"
+                        optionLabel="nombres"
+                        [virtualScroll]="true"
+                        [virtualScrollItemSize]="34"
+                        [lazy]="true"                                   
+                        [autoHighlight]="true"
+                        [autoOptionFocus]="true"
+                        class="w-full "                         
+                        [style]="{'width':'100%'}" 
+                        [inputStyle]="{'width':'100%'}"
+                    >                                                                 
+                    </p-autocomplete>
+                    <label for="nomCli">Nombre</label>
+                </p-floatlabel>
+            </div>          
+            <div  class="col-span-3 sm:col-span-2 lg:col-span-1 sm:order-3">
+                <a routerLink="/cotizador/listado">
+                    <p-button severity="secondary" label="Volver" icon="pi pi-arrow-left" class="p-button-outlined" styleClass="w-full"
+                        size="small"></p-button>
+                </a>
+            </div>          
+        </div>
+
+        <!-- search -->
+        <div class="w-full flex flex-col md:flex-row gap-2 lg:gap-4  md:items-center">
+
+            <div class="w-full">            
+                <shared-search-bar 
+                    (onSelectedProduct)="onSelectProduct($event)" 
+                    [checkedPrecioMenor]="cotizacion.minorPriceChecked" 
+                    class="w-full" 
+                    
+                    [percentageForMinorTypePrice]="percentageForMinorTypePrice"
+                >
+                </shared-search-bar>            
+            </div>
+
+            <div class="min-w-fit ">
+                <div class="flex items-center text-gray-500 font-semibold">
+                    <p-checkbox 
+                        [(ngModel)]="cotizacion.minorPriceChecked" 
+                        [binary]="true" 
+                        inputId="chkPrecioPorMenor"
+                        (ngModelChange)="onPrecioPorMenorChange()"
+                    />  
+                    <label for="chkPrecioPorMenor" class="ml-2">Precio por menor</label>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <hr class="my-2">
+    
+    <div class="flex flex-col flex-grow overflow-hidden ">
+        <div class="flex-grow overflow-y-auto ">
+            @if(isDeviceMobile()) {
+
+                @if (cotizacionCartProducts.length > 0) {
+                    <!-- <div class="space-y-2 flex flex-col gap-2 "> -->
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3 lg:gap-4">
+                        @for (product of cotizacionCartProducts; track $index) {
+                            <cotizador-card-producto 
+                                [product]="product"
+                                (onProductChange)="onProductChange()"
+                                >
+                            </cotizador-card-producto>
+                        }
+                    </div>
+                }
+                @else {
+                    <div class="flex justify-center items-center h-full">
+                        <p class="text-gray-500 text-center lg:text-lg">Aún no se han agregado productos.</p>
+                    </div>
+                }
+            }
+            @else {
+                <detalle-cotizacion-table
+                    [detailCotizacionList]="cotizacionCartProducts"
+                    (onProductChange)="onProductChange()" 
+                    (onProductScanned)="onProductScanned($event)"
+                    [checkedPrecioMenor]="cotizacion.minorPriceChecked"
+                    [percentageForMinorTypePrice]="percentageForMinorTypePrice" 
+                >
+                </detalle-cotizacion-table>
+            }
+        </div>
+    </div>
+                
+    <!-- footer -->
+    <div class="mt-1  bg-white">
+        <hr class="mb-2">
+        <div class="text-end text-lg flex justify-between my-2">            
+            <p>{{productsUnitsCount()}} {{productsUnitsCount() | i18nPlural:undsPluralMap }}</p>
+            <p class="font-bold">Total {{ getTotalCartAmount() | currency: 'S/ ' }}</p>        
+        </div>
+        <hr class="mb-4">
+
+        <!-- buttons -->
+        <div class="grid grid-cols-2 gap-2">
+
+            @if(isScannerAvailable) {
+                @if(isDeviceMobile()) {
+                    <p-button 
+                    icon="pi pi-barcode" 
+                    label="Escanear" 
+                    (onClick)="scannerVisibility = true" 
+                    styleClass="w-full h-full flex-grow" 
+                    class="w-full h-full flex-grow"
+                    />            
+                }
+                <!-- @else {
+                    <scanner-usb
+                        [products]="productsList"
+                        (onProductScanned)="onProductScanned($event)"
+                        class="w-full flex-grow"
+                    >
+                    </scanner-usb>   
+                } -->
+            }
+
+
+            <!-- <p-button 
+                icon="pi pi-save"
+                [disabled]="isFormInvalid().saveBtn"
+                label="Guardar"
+                styleClass="w-full h-full"
+                severity="info"
+                (onClick)="saveToLocalStorageCotizacion()"
+                [loading]="loadingBtnSave"
+            >
+            </p-button>
+
+            <p-button 
+                icon="pi pi-trash"
+                [disabled]="isFormInvalid().deleteBtn"
+                label="Eliminar"
+                styleClass="w-full h-full"
+                severity="danger"
+                (onClick)="confirmationModal($event)"
+                [loading]="loadingBtnDelete"
+                >
+            </p-button> -->
+
+            <div class="w-full "  [className]="isDeviceMobile()? 'col-span-1' : 'col-span-2' ">
+                @if(cotizacion.status !== cotizacionStatus.Devuelto) {
+                    <p-button 
+                        icon="pi pi-send"
+                        [disabled]="isFormInvalid().sendBtn"
+                        label="Lanzar"
+                        styleClass="w-full h-full flex-grow"
+                        severity="success"
+                        (onClick)="sendToDynamics()"
+                        [loading]="loadingBtnSend"
+                        >
+                    </p-button>
+                }
+                @else {
+                    <p-button 
+                        icon="pi pi-send"
+                        [disabled]="isFormInvalid().sendBtn"
+                        label="Editar en Dynamic"
+                        styleClass="w-full text-[14px] h-full  flex-grow"
+                        severity="success"
+                        (onClick)="updateInDynamics()"
+                        [loading]="loadingBtnSend"
+                        >
+                    </p-button>
+                }
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<p-toast position="top-center" key="toast-generate-cotizacion"/>
+<p-confirmdialog />
+
+<!-- scanner modal  -->
+<!-- @if(scannerVisibility) { -->
+    <scanner-code
+        [(modalVisibiliy)]="scannerVisibility"
+        (onScannedProduct)="onProductScanned($event)"
+        [checkedPrecioMenor]="cotizacion.minorPriceChecked"
+        [percentageForMinorTypePrice]="percentageForMinorTypePrice"
+        >
+    </scanner-code>
+    <!-- (onCloseScannerModal)="scannerVisibility = false" -->
+<!-- } -->
+
+<!-- product not found modal -->
+<p-dialog [modal]="true" [(visible)]="productNotFoundVisibility" closable="true" [style]="{ width: '20rem' }" styleClass=" border-red-500">
+    <ng-template #headless>
+        
+        <div class="text-center  ">
+            <div class="bg-red-600 rounded-t-lg p-2">
+                <span class="pi pi-exclamation-triangle text-4xl text-white"></span>
+            </div>
+            <div  class="p-4">
+                <p class="font-bold text-xl mb-3 text-red-700">Producto no encontrado</p>
+            
+                <p class="text-black">El producto no fue encontrado, intente escanear un código diferente.</p>
+            </div>
+        </div>
+
+    </ng-template>
+</p-dialog>

@@ -1,0 +1,57 @@
+
+<p-dialog 
+    header="Escanear producto" 
+    [modal]="true" 
+    [(visible)]="modalVisibiliy"  
+    id="scanner-modal"
+    [style]="{ width: '35rem' }" 
+    [breakpoints]="{ '800px': '25rem', '500px': '24rem' }" 
+    styleClass="m-2"
+    (onHide)="onCloseModal()"
+>
+
+        <div>
+            <p class="mb-2 leading-5">Enfoca el código QR o código de barras del producto para escanearlo.</p>
+            
+                <div class="flex flex-wrap gap-2 mt-2 items-center" [ngClass]="{ hidden : scanner?.isLoading ?? false}">            
+                <label for="cameraSelect">Cámara: </label>
+                <select #select1 (change)="action.playDevice(select1.value)" class="border border-slate-400 p-1 px-4 text-sm text-slate-500 rounded-md bg-white">
+                    <option [value]="null" selected>Seleccione el dispositivo</option>
+                    <option *ngFor="let c of action.devices.value; let i = index" [value]="c.deviceId" [selected]="i == action.deviceIndexActive">{{c.label}}</option>
+                </select>
+            </div>
+    
+            <div class="corner-borders m-2  ">
+                <div class="relative w-full max-w-md mx-auto min-h-28 md:min-h-40">
+                    @if(scanner?.isLoading) {
+                    <div class="text-center absolute flex justify-center items-center w-full h-full">
+                        <p-progress-spinner ariaLabel="loading" strokeWidth="5" [style]="{ width: '40px', height: '40px' }"
+                            styleClass="top-3" />
+                    </div>
+                    }
+                    
+                    <div [ngClass]="{ hidden : scanner?.isLoading ?? false}" >                    
+                        <ngx-scanner-qrcode 
+                            #action="scanner" 
+                            (event)="onValueScanned($event)" 
+                            [config]="scannerConfig"
+                            [fps]="1"
+                            [isBeep]="true"
+                            [vibrate]="1"
+                        >
+                        </ngx-scanner-qrcode>
+                        <!-- borders -->
+                        <div class="absolute inset-0 qr-scanner-overlay">
+                            <div class="qr-scanner-corner top-left"></div>
+                            <div class="qr-scanner-corner top-right"></div>
+                            <div class="qr-scanner-corner bottom-left"></div>
+                            <div class="qr-scanner-corner bottom-right"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>    
+
+</p-dialog>
+
+<p-toast position="top-center" key="toast-scanner" />

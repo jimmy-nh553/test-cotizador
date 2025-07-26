@@ -1,0 +1,102 @@
+<p-menubar class="bg-sky-500 border-0 " styleClass="bg-sky-500 border-0" >
+    <ng-template #start>
+        <!-- <div class="px-4 md:px-8">
+            <img src="/logo_globaltec_png.png" alt="logo_globalte" style="height: 70px;">
+        </div> -->
+
+        <div class="px-4 md:px-8">
+            <button (click)="visible = true" class="border-0 w-5 h-5 flex items-center justify-center rounded-lg text-white hover:text-zinc-300" >
+                <span class="pi pi-bars"></span>
+            </button>
+        </div>
+        
+        <div class="text-white text-base sm:text-lg font-semibold flex gap-4 items-center md:px-2">
+            <h1>
+                {{ title.title}}
+            </h1>
+            @if(title.isTagActive) {
+                <p-tag 
+                    [value]="title.tagLabel"
+                    [severity]="getStatusSeverity(title.severity)"
+                    styleClass="py-[1px] px-[3px]"                      
+                >
+                </p-tag>
+            }
+        </div>
+    </ng-template>
+
+    <ng-template #end>
+        @if(title.showOptionsMenu) {
+            <p-menu #menu [model]="items" [popup]="true" appendTo="body" (onShow)="menuToggle()" (onHide)="menuToggle()"/>
+            <p-button (click)="menu.toggle($event)" icon="pi pi-ellipsis-v" styleClass="bg-transparent border-0 py-0 hover:text-zinc-300" pTooltip="Opciones" tooltipPosition="left"/>           
+        }
+    </ng-template>
+</p-menubar>
+
+
+<p-drawer  [(visible)]="visible" [header]="'Bienvenido '+ getUserName()" position="left" styleClass="w-full sm:w-[350px] ">
+    <ng-template #content>
+        <div class="text-xl pb-3 mb-3 border-b border-zinc-300 ">
+            <span class="font-medium">Cotizador</span>
+        </div>
+        <ul class="list-none p-0 m-0 overflow-hidden">
+            <li
+                routerLink="/cotizador/listado"
+                routerLinkActive="bg-surface-200 rounded-md"
+                (click)="visible = false"
+            >
+                <a pRipple class="flex items-center cursor-pointer p-4 rounded-border text-surface-700 hover:bg-surface-100 duration-150 transition-colors p-ripple">
+                    <i class="pi pi-list mr-2"></i>
+                    <span class="font-medium">Listado</span>
+                </a>
+            </li>
+
+            <li
+                routerLink="/cotizador/generar"
+                routerLinkActive="bg-surface-200 rounded-md"
+                (click)="visible = false"
+            >
+                <a pRipple class="flex items-center cursor-pointer p-4 rounded-border text-surface-700 hover:bg-surface-100 duration-150 transition-colors p-ripple">
+                    <i class="pi pi-plus mr-2"></i>
+                    <span class="font-medium">Generar</span>
+                </a>
+            </li>
+            
+            <!-- configuración de redondeo al activar precio por menor -->
+            <!-- <li class="border-t border-zinc-300 mt-4 pt-3">
+                <div class="px-2 gap-2 w-full font-semibold">
+                    <div class="flex items-center gap-3">
+                        <p-togglebutton 
+                            [(ngModel)]="isRoundedActive" 
+                            onLabel="Activado" 
+                            offLabel="Desactivado"                                                      
+                            styleClass="w-[120px]"
+                            (ngModelChange)="setRoundedPriceConfig()"
+                        />
+                        <span>Redondear precio</span>
+                    </div>
+                    <p class="my-auto"></p>
+                    <div class="py-1 px-3 text-justify font-normal flex gap-1">
+                        <i class="pi pi-info-circle py-[6px]"></i>
+                        <div>
+                            <small >
+                                Esta opción redondea el precio unitario de cada producto al entero más cercano (solo aplica cuando la opción de "Precio por menor" está activada).
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </li> -->
+        </ul>
+    </ng-template>
+
+    <ng-template #footer>
+        <div (click)="logout()" class="border-t border-zinc-300">
+            <a pRipple class="flex items-center cursor-pointer p-4 rounded-border text-red-600 hover:bg-surface-100 duration-150 transition-colors p-ripple">
+                <i class="pi pi-sign-out mr-2"></i>
+                <span class="font-medium">Cerrar Sesión</span>
+            </a>
+        </div>
+    </ng-template>
+</p-drawer>
+
+<p-toast position="bottom-center" key="toast-navbar"/>

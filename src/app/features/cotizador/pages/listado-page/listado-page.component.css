@@ -1,0 +1,3 @@
+.vh-screen-navbar {
+    height: calc(100dvh - 46px) !important;
+}

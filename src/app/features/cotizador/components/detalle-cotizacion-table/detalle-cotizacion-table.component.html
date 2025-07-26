@@ -1,0 +1,83 @@
+
+<p-table 
+    [value]="detailCotizacionList" 
+    showGridlines
+    [scrollable]="true"
+
+    [scrollHeight]="'flex'"
+    size="small"
+    [tableStyle]="{ 'min-width': '38rem' }"
+>
+    <ng-template pTemplate="caption">
+        <div class="flex items-center gap-2">          
+            <scanner-usb
+                (onProductScanned)="onReciveProductScanned($event)"
+                [checkedPrecioMenor]="checkedPrecioMenor"
+                [percentageForMinorTypePrice]="percentageForMinorTypePrice"
+            ></scanner-usb>
+        </div>
+    </ng-template>
+    <ng-template #header>
+        <tr  class="py-1 px-2">
+            <th style="width: 10%;" class="py-1 px-2 text-center">Código</th>
+            <th style="width: 35%;" class="py-1 px-2 text-center">Nombre</th>
+            <th style="width: 15%;" class="py-1 px-2 text-center">Precio und</th>
+            <th style="width: 15%;" class="py-1 px-2 text-center">Cantidad</th>
+            <th style="width: 15%;" class="py-1 px-2 text-center">Importe</th>
+            <th style="width: 10%;" class="py-1 px-2 text-center">Acciones</th>
+        </tr>
+    </ng-template>
+    <ng-template #body let-product>
+        <tr class=" px-2">
+            <td  class="py-0 px-2">{{ product.productCode }}</td>
+            <td  class="py-0 px-2 whitespace-pre-wrap" [ngClass]="{'text-center': product.descProduct.length === 0}">{{ product.descProduct.length === 0 ? '-' : product.descProduct }}</td>
+            <!-- <td  class="py-0 px-2">{{ product.price | currency: 'S/ ' }}</td> -->
+
+            <td class="py-[3px] px-2">
+                <p-inputnumber 
+                    size="small"
+                    [(ngModel)]="product.price"
+                    [min]="0.1" 
+                    inputId="currency-pe" 
+                    mode="currency" 
+                    currency="PEN" 
+                    locale="es-PE"
+                    [required]="true"
+                    fluid="true" 
+                    autocomplete="off"
+                    (keypress)="validateOnlyNumbers($event)"
+                    (onBlur)="validateValidPrice(product)"   
+                    inputStyleClass="py-0 px-1"                                  
+                />
+            </td>
+
+            <td  class="py-0 px-2 text-center">
+                <quantity-input
+                    [inputOrientation]="'horizontal'"
+                    [value]="product.quantity"
+                    (onValueChange)="onQuantityChange(product, $event)"
+                    >
+                </quantity-input>
+            </td>
+            <td class="py-0 px-2">
+                {{ product.amount | currency: 'S/ ' }}
+            </td>
+            <td  class="py-0 px-2  ">
+                <div class="mx-auto w-fit">
+                    <button 
+                        pTooltip="Eliminar de la cotizacion"
+                        tooltipPosition="left"
+                        (click)="confirmationModal($event, product)" 
+                    >
+                        <span class="pi pi-trash text-red-600 hover:opacity-70  border border-transparent rounded-xl text-xl"></span>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+        <tr>
+            <td colspan="6" class="text-center">Aún no se han agregado productos.</td>
+        </tr>
+    </ng-template>
+</p-table>

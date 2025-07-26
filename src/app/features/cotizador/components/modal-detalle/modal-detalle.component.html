@@ -1,0 +1,46 @@
+<p-dialog 
+    [modal]="true" 
+    [closable]="false" 
+    [(visible)]="visible" 
+    [style]="{ width: '40rem' }"
+    [breakpoints]="{ '800px': '30rem', '500px': '24rem' }" 
+>
+    <ng-template #header>
+        <div class="  ">
+            <h2 class="text-xl font-bold">Detalle de cotización N° {{cotizacion.no}}</h2>
+        </div>
+    </ng-template>
+    
+
+    <div class="flex flex-col flex-grow overflow-hidden">
+        <div class="flex-grow overflow-y-auto">
+            <!-- @if (cotizacion.detail.length > 0) { -->
+            @if (getDetailsCount()) {
+                <p class="font-semibold text-lg mb-2">Productos agregados</p>
+                <div class="space-y-2 flex flex-col gap-2">
+                    @for (product of cotizacion.detail; track $index) {
+                        <cotizador-card-producto-detalle
+                            [product]="product"
+                        >
+                        </cotizador-card-producto-detalle>
+                    }
+                </div>
+            }
+            @else {
+                <div class="flex justify-center items-center h-full">
+                    <p class="text-gray-500 text-center lg:text-lg">No se encontraron productos.</p>
+                </div>
+            }
+        </div>
+    </div>
+
+     <ng-template #footer>
+        <div class="grid grid-cols-2 w-full  mr-2">
+            <p>{{ cotizacion.detail.length }} productos en total.</p>
+            <p class="text-lg font-semibold text-end">Total {{ cotizacion.totalPrice | currency: 'S/ '}}</p>
+            <div class="col-start-2 text-end mt-1 ">
+                <p-button label="Cerrar" severity="secondary" (click)="closeModal()" />
+            </div>
+        </div>
+     </ng-template>
+</p-dialog>

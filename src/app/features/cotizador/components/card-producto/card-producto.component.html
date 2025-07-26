@@ -1,0 +1,71 @@
+<div class="p-2 border rounded-xl border-zinc-200 grid gap-2">
+    <div class="">
+        <!-- <div class="col-span-3 lg:col-span-2 flex items-center justify-center">
+            <img
+                [src]="'https://www.svgrepo.com/show/508699/landscape-placeholder.svg'"
+                [alt]="product.description"
+                class="w-32 rounded "
+            />
+        </div> -->
+
+        <div class="  grid grid-cols-12 gap-2 items-center">
+            <div class="col-span-9 mr-3">
+                <div class="mb-2">
+                    <p class="text-wrap  font-semibold text-lg">{{product.descProduct}}</p>
+                    <p class="text-sm ">Código {{product.productCode}}</p>
+                </div>
+
+                <div class="">
+                    <div class="flex items-center">
+                        <label for="currency-pe" class="col-span-4 text-sm mr-1">Precio und</label>
+                        <div class="col-span-8 mr-3">
+                            <div class="max-w-32">
+                                <p-inputnumber 
+                                    [(ngModel)]="product.price"
+                                    [min]="0.1" 
+                                    inputId="currency-pe" 
+                                    mode="currency" 
+                                    currency="PEN" 
+                                    locale="es-PE"
+                                    [required]="true"
+                                    fluid="true" 
+                                    autocomplete="off"
+                                    [style]="{'max-width': '3rem'}"
+                                    size="small"
+                                    (ngModelChange)="updateCartProduct()"                                    
+                                />
+                            </div>
+                        </div>
+                    </div> 
+
+                    
+                </div>
+            </div>
+
+            
+            <div class="col-span-3 flex justify-end gap-2 md:gap-3 lg:gap-5 xl:gap-8 " >
+
+                <quantity-input
+                    [value]="product.quantity"
+                    (onValueChange)="onQuantityChange($event)"
+                >                        
+                </quantity-input>
+
+                <div class="flex flex-col justify-around">
+
+                    <button (click)="confirmationModal($event)" >
+                        <span class="pi pi-trash text-red-600 hover:opacity-70  border border-transparent rounded-xl text-xl"></span>
+                    </button>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="flex items-center justify-end font-semibold">
+            <p>Importe <span> {{product.amount | currency: 'S/ '}} </span></p>
+        </div>
+
+    </div>
+    
+</div>

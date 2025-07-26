@@ -1,0 +1,6 @@
+:host ::ng-deep .p-autocomplete input::placeholder {
+    color: #3f3f46 !important; /* Cambia este color al que necesites */
+    opacity: 1; /* Firefox requiere esto para mostrar el color correctamente */
+    font-weight: 500;
+    font-size: 16px;
+  }

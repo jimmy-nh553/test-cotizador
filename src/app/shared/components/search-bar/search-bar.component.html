@@ -1,0 +1,49 @@
+<p-autocomplete
+    [(ngModel)]="selectedProduct"
+    [suggestions]="filteredProducts"                                 
+    (input)="writtingInterval($event)"                                
+    (completeMethod)="writtingInterval($event)"
+    (onSelect)="onSelectProduct($event)"
+    (onLazyLoad)="loadNextPageOfCustomers($event)"
+    optionLabel="description"
+    dataKey="code" 
+    [virtualScroll]="true"
+    [virtualScrollItemSize]="75" 
+    [lazy]="true"                                   
+    [autoHighlight]="true"
+    [autoOptionFocus]="true"
+    class="w-full h-10 rounded-md " 
+    styleClass="border border-zinc-400 rounded-md"
+    [style]="{'width':'100%'}" 
+    [inputStyle]="{'width':'100%'}"
+    placeholder="⌕ Buscar productos por nombre o código"
+    size="small"
+>                
+    <ng-template let-product #item>
+        <div class="flex w-full  items-center justify-between">
+            <div class="flex gap-4 w-full">
+                <div class="grid grid-cols-12 w-full">
+                    <div class="col-span-8">
+                        <p class="text-wrap line-clamp-3 leading-[1.2] font-semibold whitespace-pre-wrap">{{ product.description }}</p>
+                        <p class="text-sm pt-2">Código: {{product.code}}</p>
+                    </div>
+                    <div class="col-span-4 flex flex-col items-end">
+                        <span class="font-bold">{{ product.unitPrice | currency: 'S/ ' }}</span>
+                        <span class="font-semibold">Stock: {{product.stock}}</span>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </ng-template>
+    <ng-template #empty>
+        <div class="font-medium px-3 py-2 text-sm">No se encontraron resultados.</div>
+    </ng-template> 
+    <ng-template #footer>
+        @if(filteredProducts.length > 0) {
+            <div class="px-3 py-3 text-sm  border-t-[1px] border-zinc-300">
+                {{filteredProducts.length}} productos encontrados
+            </div>
+        }
+    </ng-template>                                                 
+</p-autocomplete>
