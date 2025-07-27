@@ -92,7 +92,8 @@ export class ScannerCodeComponent implements OnInit, OnDestroy {
   // doneScanningInterval: number = 180000; //3 minutos
   doneScanningInterval: number = 120000; //2 minutos
   // doneScanningInterval: number = 150000; //1.5 minutos
-  // doneScanningInterval: number = 1200; //5 seg
+  // doneScanningInterval: number = 10000; //10 seg
+  // doneScanningInterval: number = 5000; //5 seg
 
   constructor( 
     private messageServ: MessageService,
@@ -130,9 +131,9 @@ export class ScannerCodeComponent implements OnInit, OnDestroy {
   }
 
   async checkCameraPermission(): Promise<boolean> {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      stream.getTracks().forEach(track => track.stop());
+    try { //activa la cámara (si da error: no hay permisos o se está usando)
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });      
+      stream.getTracks().forEach(track => track.stop()); // libera la cámara y puede ser usada por el scanner
       return true;
     } catch (err) {
       console.error('Error al verificar los permisos de la cámara:', err);
@@ -141,6 +142,20 @@ export class ScannerCodeComponent implements OnInit, OnDestroy {
   }
 
   async initScanner() {
+    this.lastScannedValue = undefined;
+    clearTimeout(this.scanningTimer); // borrar intervalo
+
+    if (!this.modalVisibiliy) {
+      this.handle(this.scanner, 'stop');
+      return;
+    }
+
+    // scanner pausado => play
+    if(this.scanner?.isPause) {
+      this.handle(this.scanner, 'play'); 
+      return; 
+    }
+    
     if (this.modalVisibiliy) {
       const hasPermission = await this.checkCameraPermission();
       if (!hasPermission) {
@@ -156,56 +171,25 @@ export class ScannerCodeComponent implements OnInit, OnDestroy {
       }
     }
 
-    this.lastScannedValue = undefined;
-    clearTimeout(this.scanningTimer); // borrar intervalo
-
-    if(this.scanner?.isPause) {
-      this.handle(this.scanner, 'play'); 
-      return; 
-    }
-
+    // scanner detenido => start
     this.handle(this.scanner, 'start');
   }
 
-
-  async changeModalVisibiliy(visible: boolean) {
-    if (visible) {
-      const hasPermission = await this.checkCameraPermission();
-      if (!hasPermission) {
-        this.messageServ.add({
-          severity: 'error',
-          summary: 'Permisos de cámara denegados',
-          detail: 'Para usar el escaner, necesita habilitar los permisos de cámara en la configuración de su navegador.',
-          key: 'toast-scanner',
-          life: 10000,
-          sticky: true,
-          closable: true
-        });
-        return;
-      }
-    }
-  
-    this.modalVisibiliy = visible;
-    this.lastScannedValue = undefined;
-
-    if (!visible) {
-      this.scanner?.stop();
-      return;
-    }
-    this.handle(this.scanner, 'start');
-  }
-
-  onCloseModal() {
+  async onCloseModal() {
     this.modalVisibiliy = false;
+    
+    if(this.scanner?.isStart) {
+      // this.handle(this.scanner, 'stop');
+      this.handle(this.scanner, 'pause');
+  
+      clearTimeout(this.scanningTimer);
+      this.scanningTimer = setTimeout(() => {
+        this.handle(this.scanner, 'stop');
+        console.warn('scanner timer interval end');      
+      }, this.doneScanningInterval);
+    }
+    
 
-    // this.handle(this.scanner, 'stop');
-    this.handle(this.scanner, 'pause');
-
-    clearTimeout(this.scanningTimer);
-    this.scanningTimer = setTimeout(() => {
-      this.handle(this.scanner, 'stop');
-      console.warn('scanner timer interval end');      
-    }, this.doneScanningInterval);
   }
 
   searchScannedProduct(code: string) {
@@ -272,7 +256,7 @@ export class ScannerCodeComponent implements OnInit, OnDestroy {
   emitProductValue(code: string) {  
     this.lastScannedValue = code; 
     this.onScannedProduct.emit(this.productScanned);
-
+    
     this.onCloseModal();
   }
 
